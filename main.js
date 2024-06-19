@@ -26,7 +26,7 @@ async function addProduct() {
     id: user_id.toString(),
     name: productName.value,
     price: productPrice.value,
-    category: productDesc.value,
+    category: productCategory.value,
     description: productDesc.value,
     stock_Quantity: stockQuantity.value,
   };
@@ -35,6 +35,7 @@ async function addProduct() {
     method: "POST",
     body: JSON.stringify(product),
   });
+  getProducts();
 
   console.log(data);
   clear();
