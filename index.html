@@ -19,23 +19,32 @@
       <h1 class="mb-4">Product Management System</h1>
       <div class="form-group mb-3">
         <label class="mb-2" for="productName">productName</label>
-        <input type="text" class="form-control" id="productName">
+        <input oninput="validateName(this.value)" type="text" class="form-control" id="productName">
+        <p class="text-danger d-none" id="wrongName"></p>
       </div>
       <div class="form-group mb-3">
         <label class="mb-2" for="productPrice">productPrice</label>
-        <input type="number" min="0" class="form-control" id="productPrice">
+        <input oninput="validatePrice(this.value)"  type="number" min="0" class="form-control" id="productPrice">
+        <p class="text-danger d-none" id="wrongPrice"></p>
+        
       </div>
       <div class="form-group mb-3 ">
         <label class="mb-2" for="productCategory">productCategory</label>
-        <input type="text" class="form-control" id="productCategory">
+        <input oninput="validateCateg(this.value)" type="text" class="form-control" id="productCategory">
+        <p class="text-danger d-none" id="wrongCateg"></p>
+
       </div>
       <div class="form-group mb-3">
         <label class="mb-2" for="productDesc">productDesc</label>
-        <input type="text" class="form-control" id="productDesc">
+        <input oninput="validateDes(this.value)" type="text" class="form-control" id="productDesc">
+        <p class="text-danger d-none" id="wrongDesc"></p>
+
       </div>
       <div class="form-group mb-3">
         <label class="mb-2" for="stockQuantity">Stock Quantity</label>
-        <input type="number" class="form-control" id="stockQuantity">
+        <input oninput="validateQuantiy(value)" type="number" min="0" class="form-control" id="stockQuantity">
+        <p class="text-danger d-none" id="wrongQuantity"></p>
+
       </div>
     
    
