@@ -25,26 +25,25 @@ getProducts();
 
 async function addProduct() {
   let user_id = JSON.parse(localStorage.getItem("lastId")) + 1;
- if(validation()){
-  var product = {
-    id: user_id.toString(),
-    name: productName.value,
-    price: productPrice.value,
-    category: productCategory.value,
-    description: productDesc.value,
-    stock_Quantity: stockQuantity.value,
-  };
-  localStorage.setItem("lastId", product.id);
-  let data = await fetch("http://localhost:3000/products", {
-    method: "POST",
-    body: JSON.stringify(product),
-  });
-  getProducts();
+  if (validation()) {
+    var product = {
+      id: user_id.toString(),
+      name: productName.value,
+      price: productPrice.value,
+      category: productCategory.value,
+      description: productDesc.value,
+      stock_Quantity: stockQuantity.value,
+    };
+    localStorage.setItem("lastId", product.id);
+    let data = await fetch("http://localhost:3000/products", {
+      method: "POST",
+      body: JSON.stringify(product),
+    });
+    getProducts();
 
-  console.log(data);
-  clear();
- }
-
+    console.log(data);
+    clear();
+  }
 }
 
 function displayProducts(list) {
@@ -74,6 +73,7 @@ function clear() {
   productPrice.value = "";
   productCategory.value = "";
   productDesc.value = "";
+  stockQuantity.value = "";
 }
 
 //------------- delete product ----------//
@@ -119,35 +119,37 @@ async function getUpdatedProduct(id) {
 }
 
 async function update() {
-  updateBtn.classList.add("d-none");
-  addBtn.classList.remove("d-none");
-  var product = {
-    id: updatedProd.id,
-    name: productName.value,
-    price: productPrice.value,
-    category: productCategory.value,
-    description: productDesc.value,
-    stock_Quantity: stockQuantity.value,
-    image: updatedProd.image,
-    rating: updatedProd.rating,
-  };
-  let data = await fetch(`http://localhost:3000/products/${product.id}`, {
-    method: "PUT",
-    body: JSON.stringify(product),
-  });
-  console.log(data);
-  getProducts();
+  if (validation()) {
+    updateBtn.classList.add("d-none");
+    addBtn.classList.remove("d-none");
+    var product = {
+      id: updatedProd.id,
+      name: productName.value,
+      price: productPrice.value,
+      category: productCategory.value,
+      description: productDesc.value,
+      stock_Quantity: stockQuantity.value,
+      image: updatedProd.image,
+      rating: updatedProd.rating,
+    };
+    let data = await fetch(`http://localhost:3000/products/${product.id}`, {
+      method: "PUT",
+      body: JSON.stringify(product),
+    });
+    console.log(data);
+    getProducts();
 
-  clear();
+    clear();
 
-  console.log(productList);
+    console.log(productList);
+  }
 }
 
 //------------ validatino ----------//
 
 //---validate name
 function validateName(value) {
-  var regex = /^[A-Z][a-z]{2,13}$/;
+  var regex = /^[A-Z][a-z]{2,20}$/;
 
   if (value.length === 0) {
     wrongName.classList.remove("d-none");
@@ -159,7 +161,8 @@ function validateName(value) {
     wrongName.classList.add("d-none");
     return true;
   } else {
-    wrongName.innerHTML="Invalid name , name must start with capital [3-15] characters";
+    wrongName.innerHTML =
+      "Invalid name , name must start with capital [3-15] characters";
     wrongName.classList.remove("d-none");
     return false;
   }
@@ -179,7 +182,8 @@ function validatePrice(value) {
     wrongPrice.classList.add("d-none");
     return true;
   } else {
-    wrongPrice.innerHTML="Invalid price [Decimal Number with Two Decimal Places]"
+    wrongPrice.innerHTML =
+      "Invalid price [Decimal Number with Two Decimal Places]";
     wrongPrice.classList.remove("d-none");
     return false;
   }
@@ -188,12 +192,11 @@ function validatePrice(value) {
 //--- validate category
 
 function validateCateg(value) {
-
   if (value.length === 0) {
     wrongCateg.classList.remove("d-none");
     wrongCateg.innerHTML = "required";
     return false;
-  }else {
+  } else {
     wrongCateg.classList.add("d-none");
     return true;
   }
@@ -201,12 +204,11 @@ function validateCateg(value) {
 //--- validate Description
 
 function validateDes(value) {
-
   if (value.length === 0) {
     wrongDesc.classList.remove("d-none");
     wrongDesc.innerHTML = "required";
     return false;
-  }else {
+  } else {
     wrongDesc.classList.add("d-none");
     return true;
   }
@@ -214,27 +216,32 @@ function validateDes(value) {
 
 //--- validate Stock Quantity
 
-function validateQuantiy(value) {
+function validateQuantity(value) {
   if (value.length === 0) {
     wrongQuantity.classList.remove("d-none");
     wrongQuantity.innerHTML = "required";
     return false;
-  }else {
+  } else {
     wrongQuantity.classList.add("d-none");
     return true;
   }
 }
 
-
 //--- validate all inputs
 
-function validation(){
-  let validName=validateName(productName.value);
-  let validatPrice=validatePrice(productPrice.value);
-  let validCateg=validateCateg(productCategory.value);
-  let validDes= validateDes(productDesc.value);
-  let validateQuantity= validateQuantiy(stockQuantity.value);
-   
+function validation() {
+  let validName = validateName(productName.value);
+  let validatPrice = validatePrice(productPrice.value);
+  let validCateg = validateCateg(productCategory.value);
+  let validDes = validateDes(productDesc.value);
+  let validQuantity = validateQuantity(stockQuantity.value);
 
-  return validName&&validatPrice&&validCateg&&validatPrice&&validDes&&validateQuantity;
+  return (
+    validName &&
+    validatPrice &&
+    validCateg &&
+    validatPrice &&
+    validDes &&
+    validQuantity
+  );
 }
