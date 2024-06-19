@@ -20,6 +20,7 @@ async function getProducts() {
 getProducts();
 
 async function addProduct() {
+   
   let user_id = JSON.parse(localStorage.getItem("lastId")) + 1;
 
   var product = {
@@ -76,6 +77,7 @@ async function deleteProduct(id) {
   let data = await fetch(`http://localhost:3000/products/${id}`, {
     method: "DELETE",
   });
+getProducts();
   console.log(data);
 }
 
@@ -129,8 +131,10 @@ async function update() {
     body: JSON.stringify(product),
   });
   console.log(data);
+  getProducts();
+ 
   clear();
 
-  displayProducts(productList);
+  
   console.log(productList);
 }
