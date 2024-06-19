@@ -6,7 +6,11 @@ let stockQuantity = document.getElementById("stockQuantity");
 let addBtn = document.getElementById("addBtn");
 let updateBtn = document.getElementById("updateBtn");
 let demo = document.getElementById("demo");
-
+let wrongName = document.getElementById("wrongName");
+let wrongPrice = document.getElementById("wrongPrice");
+let wrongCateg = document.getElementById("wrongCateg");
+let wrongDesc = document.getElementById("wrongDesc");
+let wrongQuantity = document.getElementById("wrongQuantity");
 let productList = [];
 async function getProducts() {
   let data = await fetch("http://localhost:3000/products");
@@ -20,9 +24,8 @@ async function getProducts() {
 getProducts();
 
 async function addProduct() {
-   
   let user_id = JSON.parse(localStorage.getItem("lastId")) + 1;
-
+ if(validation()){
   var product = {
     id: user_id.toString(),
     name: productName.value,
@@ -40,6 +43,8 @@ async function addProduct() {
 
   console.log(data);
   clear();
+ }
+
 }
 
 function displayProducts(list) {
@@ -77,7 +82,7 @@ async function deleteProduct(id) {
   let data = await fetch(`http://localhost:3000/products/${id}`, {
     method: "DELETE",
   });
-getProducts();
+  getProducts();
   console.log(data);
 }
 
@@ -132,9 +137,104 @@ async function update() {
   });
   console.log(data);
   getProducts();
- 
+
   clear();
 
-  
   console.log(productList);
+}
+
+//------------ validatino ----------//
+
+//---validate name
+function validateName(value) {
+  var regex = /^[A-Z][a-z]{2,13}$/;
+
+  if (value.length === 0) {
+    wrongName.classList.remove("d-none");
+    wrongName.innerHTML = "required";
+    return false;
+  }
+
+  if (regex.test(value)) {
+    wrongName.classList.add("d-none");
+    return true;
+  } else {
+    wrongName.innerHTML="Invalid name , name must start with capital [3-15] characters";
+    wrongName.classList.remove("d-none");
+    return false;
+  }
+}
+
+//--- validate price
+
+function validatePrice(value) {
+  var regex = /^\d+(\.\d{1,2})?$/;
+  if (value.length === 0) {
+    wrongPrice.classList.remove("d-none");
+    wrongPrice.innerHTML = "required";
+    return false;
+  }
+
+  if (regex.test(value)) {
+    wrongPrice.classList.add("d-none");
+    return true;
+  } else {
+    wrongPrice.innerHTML="Invalid price [Decimal Number with Two Decimal Places]"
+    wrongPrice.classList.remove("d-none");
+    return false;
+  }
+}
+
+//--- validate category
+
+function validateCateg(value) {
+
+  if (value.length === 0) {
+    wrongCateg.classList.remove("d-none");
+    wrongCateg.innerHTML = "required";
+    return false;
+  }else {
+    wrongCateg.classList.add("d-none");
+    return true;
+  }
+}
+//--- validate Description
+
+function validateDes(value) {
+
+  if (value.length === 0) {
+    wrongDesc.classList.remove("d-none");
+    wrongDesc.innerHTML = "required";
+    return false;
+  }else {
+    wrongDesc.classList.add("d-none");
+    return true;
+  }
+}
+
+//--- validate Stock Quantity
+
+function validateQuantiy(value) {
+  if (value.length === 0) {
+    wrongQuantity.classList.remove("d-none");
+    wrongQuantity.innerHTML = "required";
+    return false;
+  }else {
+    wrongQuantity.classList.add("d-none");
+    return true;
+  }
+}
+
+
+//--- validate all inputs
+
+function validation(){
+  let validName=validateName(productName.value);
+  let validatPrice=validatePrice(productPrice.value);
+  let validCateg=validateCateg(productCategory.value);
+  let validDes= validateDes(productDesc.value);
+  let validateQuantity= validateQuantiy(stockQuantity.value);
+   
+
+  return validName&&validatPrice&&validCateg&&validatPrice&&validDes&&validateQuantity;
 }
