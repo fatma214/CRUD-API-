@@ -11,7 +11,10 @@ let wrongPrice = document.getElementById("wrongPrice");
 let wrongCateg = document.getElementById("wrongCateg");
 let wrongDesc = document.getElementById("wrongDesc");
 let wrongQuantity = document.getElementById("wrongQuantity");
+let selectBoxCategory = document.getElementById("selectBoxCategory");
+let selectedCategory = document.getElementById("selectedCategory");
 let productList = [];
+
 async function getProducts() {
   let data = await fetch("http://localhost:3000/products");
   let res = await data.json();
@@ -30,7 +33,7 @@ async function addProduct() {
       id: user_id.toString(),
       name: productName.value,
       price: productPrice.value,
-      category: productCategory.value,
+      category: selectBoxCategory.value,
       description: productDesc.value,
       stock_Quantity: stockQuantity.value,
     };
@@ -110,7 +113,7 @@ async function getUpdatedProduct(id) {
   console.log(updatedProd);
   productName.value = updatedProd.name;
   productPrice.value = updatedProd.price;
-  productCategory.value = updatedProd.category;
+  selectedCategory.innerText = updatedProd.category;
   productDesc.value = updatedProd.description;
   stockQuantity.value = updatedProd.stock_Quantity;
 
@@ -126,7 +129,7 @@ async function update() {
       id: updatedProd.id,
       name: productName.value,
       price: productPrice.value,
-      category: productCategory.value,
+      category: selectedCategory.innerText,
       description: productDesc.value,
       stock_Quantity: stockQuantity.value,
       image: updatedProd.image,
@@ -145,11 +148,11 @@ async function update() {
   }
 }
 
-//------------ validatino ----------//
+//------------ validation ----------//
 
 //---validate name
 function validateName(value) {
-  var regex = /^[A-Z][a-z]{2,20}$/;
+  var regex = /^[A-Z][a-zA-Z]{2,20}( [A-Za-z-0-9']{1,20}){0,10}$/;
 
   if (value.length === 0) {
     wrongName.classList.remove("d-none");
@@ -191,15 +194,29 @@ function validatePrice(value) {
 
 //--- validate category
 
-function validateCateg(value) {
-  if (value.length === 0) {
-    wrongCateg.classList.remove("d-none");
-    wrongCateg.innerHTML = "required";
-    return false;
-  } else {
-    wrongCateg.classList.add("d-none");
+function validateCategory() {
+  let regex = /^[a-zA-Z ']{3,20}$/;
+
+  if (regex.test(productCategory.value)) {
+    errorMsgCategory.classList.add("d-none");
     return true;
+  } else {
+    errorMsgCategory.classList.remove("d-none");
+    errorMsgCategory.innerHTML = "only Charcters [3-20]charcater";
+    return false;
   }
+}
+//---validate SelectCategory
+function validateSelectCategory() {
+  const selectedCategoryText = selectedCategory.innerText.trim();
+  if (selectedCategoryText === "-- Select Category --") {
+    document.getElementById("wrongCateg").classList.remove("d-none");
+    document.getElementById("wrongCateg").innerText =
+      "Please select a category";
+    return false;
+  }
+  document.getElementById("wrongCateg").classList.add("d-none");
+  return true;
 }
 //--- validate Description
 
@@ -232,7 +249,7 @@ function validateQuantity(value) {
 function validation() {
   let validName = validateName(productName.value);
   let validatPrice = validatePrice(productPrice.value);
-  let validCateg = validateCateg(productCategory.value);
+  let validCateg = validateSelectCategory();
   let validDes = validateDes(productDesc.value);
   let validQuantity = validateQuantity(stockQuantity.value);
 
@@ -244,4 +261,96 @@ function validation() {
     validDes &&
     validQuantity
   );
+}
+
+//--- display categories
+let arrOfCategories = [];
+
+async function getCategories() {
+  let data = await fetch("http://localhost:3000/categories");
+  let res = await data.json();
+  arrOfCategories = res;
+  console.log(arrOfCategories);
+  console.log(res);
+  displayCategories(arrOfCategories);
+}
+
+getCategories();
+function displayCategories(arr) {
+  let options = ``;
+  for (let i = 0; i < arr.length; i++) {
+    options += `<li class="dropdown-option d-flex justify-content-between">
+       ${arr[i].name} 
+      <div onclick="stop(event)">
+        <i class="fa-solid fa-pen-to-square" onclick="getUpdatedCateg('${arr[i].id}',event)"></i>
+        <i class="fa-regular fa-trash-can" onclick="deleteCategory('${arr[i].id}',event)"></i>
+      </div>
+    
+    </li>`;
+  }
+  selectBoxCategory.innerHTML = options;
+}
+function stop(e) {
+  e.stopPropagation();
+}
+async function addCategory() {
+  if (validateCategory()) {
+    let categ_id = JSON.parse(localStorage.getItem("lastCategoryID")) + 1;
+
+    var category = {
+      id: categ_id.toString(),
+      name: productCategory.value,
+    };
+    localStorage.setItem("lastCategoryID", category.id);
+    let data = await fetch("http://localhost:3000/categories", {
+      method: "POST",
+      body: JSON.stringify(category),
+    });
+    getCategories();
+
+    clear();
+  }
+}
+
+function select(e) {
+  document.getElementById("wrongCateg").classList.add("d-none");
+  console.log(e.target);
+  let selectedOption = e.target.textContent;
+  selectedCategory.innerHTML = selectedOption;
+}
+
+let updatedCategory = {};
+async function getUpdatedCateg(id) {
+  let data = await fetch(`http://localhost:3000/categories/${id}`);
+  updatedCategory = await data.json();
+  console.log(updatedCategory);
+
+  updateCategBtn.classList.remove("d-none");
+  addCategBtn.classList.add("d-none");
+  productCategory.value = updatedCategory.name;
+}
+async function updateCategory(e) {
+  e.stopPropagation();
+  updateCategBtn.classList.add("d-none");
+  addCategBtn.classList.remove("d-none");
+  var category = {
+    id: updatedCategory.id,
+    name: productCategory.value,
+  };
+  let data = await fetch(`http://localhost:3000/categories/${category.id}`, {
+    method: "PUT",
+    body: JSON.stringify(category),
+  });
+   
+  getCategories();
+
+  productCategory.value=""
+}
+async function deleteCategory(id, event) {
+  event.stopPropagation();
+  console.log(id);
+  let data = await fetch(`http://localhost:3000/categories/${id}`, {
+    method: "DELETE",
+  });
+  getCategories();
 }

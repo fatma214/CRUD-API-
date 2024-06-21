@@ -1,4 +1,44 @@
-body{
-    background-color: black;
-    color:white;
+body {
+  background-color: black;
+  color: white;
+}
+
+.custom-dropdown {
+  position: relative;
+  width: 200px;
+}
+
+.dropdown-selected {
+  padding: 7px;
+  background-color: #f0f0f0;
+  cursor: pointer;
+}
+
+.dropdown-options {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+  background-color: #ffffff;
+  border: 1px solid #ccc;
+  display: none;
+}
+
+.dropdown-options li {
+  padding: 5px;
+}
+
+.dropdown-options li button {
+  margin-left: 10px;
+}
+
+.dropdown-options li:hover {
+  background-color: #f0f0f0;
+}
+
+.dropdown-selected:hover .dropdown-options {
+  display: block;
 }
