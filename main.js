@@ -82,6 +82,7 @@ function clear() {
   productCategory.value = "";
   productDesc.value = "";
   stockQuantity.value = "";
+  productImage.value = ""
   imagePreview.classList.add("d-none");
 }
 
