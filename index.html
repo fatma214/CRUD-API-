@@ -21,18 +21,18 @@
       <div class="col-md-8  py-5">
         <h1 class="mb-4 text-center">Product Management System</h1>
         <div class="form-group mb-3">
-          <label class="mb-2" for="productName">productName</label>
+          <label class="mb-2" for="productName">product Name</label>
           <input oninput="validateName(this.value)" type="text" class="form-control" id="productName">
           <p class="text-danger d-none" id="wrongName"></p>
         </div>
         <div class="form-group mb-3">
-          <label class="mb-2" for="productPrice">productPrice</label>
+          <label class="mb-2" for="productPrice">product Price</label>
           <input oninput="validatePrice(this.value)" type="number" min="0" class="form-control" id="productPrice">
           <p class="text-danger d-none" id="wrongPrice"></p>
 
         </div>
         <div class="form-group mb-3 ">
-          <label class="mb-2" for="productCategory">productCategory</label>
+          <label class="mb-2" for="productCategory">product Category</label>
           <div class="d-flex justify-content-between align-items-start">
             <div>
               <!-- <select oninput="validateSelectCategory()" id="selectBoxCategory" class="rounded-2 px-4 form-control">
@@ -63,7 +63,7 @@
 
         </div>
         <div class="form-group mb-3">
-          <label class="mb-2" for="productDesc">productDesc</label>
+          <label class="mb-2" for="productDesc">product Description</label>
           <input oninput="validateDes(this.value)" type="text" class="form-control" id="productDesc">
           <p class="text-danger d-none" id="wrongDesc"></p>
 
@@ -76,10 +76,10 @@
         </div>
 
         <div class="mb-3">
-          <label for="productImage" class="form-label">Product Image URL</label>
-          <input type="text" class="form-control" id="productImage" placeholder="Enter image URL">
+          <label for="productImage" class="form-label">Product Image</label>
+          <input type="file" class="form-control" id="productImage" >
+          <img class="d-none" id="imagePreview" src="#" alt="Image Preview" style="width: 100px; height: 100px;"/>
         </div>
-        
 
         <button onclick="addProduct()" id="addBtn" class="btn btn-success">Add product</button>
         <button onclick="update()" class="btn btn-warning d-none" id="updateBtn">update product</button>
@@ -94,11 +94,12 @@
         <table class="table  text-white text-center">
           <thead>
             <th>id</th>
-            <th>ProuductName</th>
-            <th>prouductPrice</th>
-            <th>productCategory</th>
-            <th>productDesc</th>
+            <th>Prouduct Name</th>
+            <th>product Price</th>
+            <th>product Category</th>
+            <th>product Description</th>
             <th>Stock Quantity</th>
+            <th>product image</th>
             <th>Update</th>
             <th>delete</th>
 

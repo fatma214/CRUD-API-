@@ -13,6 +13,9 @@ let wrongDesc = document.getElementById("wrongDesc");
 let wrongQuantity = document.getElementById("wrongQuantity");
 let selectBoxCategory = document.getElementById("selectBoxCategory");
 let selectedCategory = document.getElementById("selectedCategory");
+
+let productImage = document.getElementById("productImage");
+let imagePreview = document.getElementById("imagePreview");
 let productList = [];
 
 async function getProducts() {
@@ -116,11 +119,13 @@ async function getUpdatedProduct(id) {
   selectedCategory.innerText = updatedProd.category;
   productDesc.value = updatedProd.description;
   stockQuantity.value = updatedProd.stock_Quantity;
-
+  imagePreview.src=updatedProd.image;
   updateBtn.classList.remove("d-none");
   addBtn.classList.add("d-none");
-}
 
+  imagePreview.classList.remove("d-none")
+
+}
 async function update() {
   if (validation()) {
     updateBtn.classList.add("d-none");
@@ -353,4 +358,117 @@ async function deleteCategory(id, event) {
     method: "DELETE",
   });
   getCategories();
+}
+
+
+//--images
+
+
+
+productImage.addEventListener("change", function() {
+
+  let file = this.files[0];
+  console.log(file);
+ 
+  if (file) {
+    let reader = new FileReader();
+    reader.onload = function(e) {
+      imagePreview.src = e.target.result;
+      // console.log(e.target);
+      imagePreview.style.display = "block";
+    }
+    reader.readAsDataURL(file);
+  }
+});
+
+
+async function addProduct() {
+  let user_id = JSON.parse(localStorage.getItem("lastId")) + 1;
+  if (validation()) {
+    let file = productImage.files[0];
+    let base64Image = await convertToBase64(file);
+    
+    var product = {
+      id: user_id.toString(),
+      name: productName.value,
+      price: productPrice.value,
+      category: selectedCategory.innerText,
+      description: productDesc.value,
+      stock_Quantity: stockQuantity.value,
+      image: base64Image // Save the image as a Base64 string
+    };
+    localStorage.setItem("lastId", product.id);
+    let data = await fetch("http://localhost:3000/products", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(product)
+    });
+    getProducts();
+    clear();
+  }
+}
+
+async function update() {
+  if (validation()) {
+    updateBtn.classList.add("d-none");
+    addBtn.classList.remove("d-none");
+
+    let file = productImage.files[0];
+    let base64Image = file ? await convertToBase64(file) : updatedProd.image;
+
+    var product = {
+      id: updatedProd.id,
+      name: productName.value,
+      price: productPrice.value,
+      category: selectedCategory.innerText,
+      description: productDesc.value,
+      stock_Quantity: stockQuantity.value,
+      image: base64Image,
+      rating: updatedProd.rating
+    };
+    let data = await fetch(`http://localhost:3000/products/${product.id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(product)
+    });
+    getProducts();
+    clear();
+  }
+}
+
+function convertToBase64(file) {
+  if(file){
+    return new Promise((resolve, reject) => {
+      let reader = new FileReader();
+      reader.onload = function() {
+        resolve(reader.result);
+      }
+      reader.onerror = function(error) {
+        reject(error);
+      }
+      reader.readAsDataURL(file);
+    });
+  }
+
+}
+function displayProducts(list) {
+  let productRows = ``;
+  for (let i = 0; i < list.length; i++) {
+    productRows += `<tr>
+        <td>${list[i].id}</td>
+        <td>${list[i].newName ? list[i].newName : list[i].name}</td>
+        <td>${list[i].price}</td>
+        <td>${list[i].category}</td>
+        <td>${list[i].description?.split(" ").slice(0, 15).join(" ")}</td>
+        <td>${list[i].stock_Quantity}</td>
+        <td><img src="${list[i].image}" alt="Product Image" class="prodImage"/></td>
+        <td><button onclick="getUpdatedProduct(${list[i].id})" class="btn btn-warning btn-sm">Update</button></td>
+        <td><button onclick="deleteProduct(${list[i].id})" class="btn btn-danger btn-sm">Delete</button></td>
+      </tr>`;
+  }
+  demo.innerHTML = productRows;
 }
