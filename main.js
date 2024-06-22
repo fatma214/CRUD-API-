@@ -29,25 +29,31 @@ async function getProducts() {
 
 getProducts();
 
+
 async function addProduct() {
   let user_id = JSON.parse(localStorage.getItem("lastId")) + 1;
   if (validation()) {
+    let file = productImage.files[0];
+    let base64Image = await convertToBase64(file);
+    
     var product = {
       id: user_id.toString(),
       name: productName.value,
       price: productPrice.value,
-      category: selectBoxCategory.value,
+      category: selectedCategory.innerText,
       description: productDesc.value,
       stock_Quantity: stockQuantity.value,
+      image: base64Image // Save the image as a Base64 string
     };
     localStorage.setItem("lastId", product.id);
     let data = await fetch("http://localhost:3000/products", {
       method: "POST",
-      body: JSON.stringify(product),
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(product)
     });
     getProducts();
-
-    console.log(data);
     clear();
   }
 }
@@ -62,15 +68,11 @@ function displayProducts(list) {
         <td>${list[i].category}</td>
         <td>${list[i].description?.split(" ").slice(0, 15).join(" ")}</td>
         <td>${list[i].stock_Quantity}</td>
-        <td><button  onclick="getUpdatedProduct(${
-          list[i].id
-        })"  class="btn btn-warning btn-sm">Update</button></td>
-        <td><button  onclick="deleteProduct(${
-          list[i].id
-        })" class="btn btn-danger btn-sm">Delete</button></td>
+        <td><img src="${list[i].image}" alt="Product Image" class="prodImage"/></td>
+        <td><button onclick="getUpdatedProduct(${list[i].id})" class="btn btn-warning btn-sm">Update</button></td>
+        <td><button onclick="deleteProduct(${list[i].id})" class="btn btn-danger btn-sm">Delete</button></td>
       </tr>`;
   }
-
   demo.innerHTML = productRows;
 }
 
@@ -80,6 +82,7 @@ function clear() {
   productCategory.value = "";
   productDesc.value = "";
   stockQuantity.value = "";
+  imagePreview.classList.add("d-none");
 }
 
 //------------- delete product ----------//
@@ -130,6 +133,10 @@ async function update() {
   if (validation()) {
     updateBtn.classList.add("d-none");
     addBtn.classList.remove("d-none");
+
+    let file = productImage.files[0];
+    let base64Image = file ? await convertToBase64(file) : updatedProd.image;
+
     var product = {
       id: updatedProd.id,
       name: productName.value,
@@ -137,21 +144,21 @@ async function update() {
       category: selectedCategory.innerText,
       description: productDesc.value,
       stock_Quantity: stockQuantity.value,
-      image: updatedProd.image,
-      rating: updatedProd.rating,
+      image: base64Image,
+      rating: updatedProd.rating
     };
     let data = await fetch(`http://localhost:3000/products/${product.id}`, {
       method: "PUT",
-      body: JSON.stringify(product),
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(product)
     });
-    console.log(data);
     getProducts();
-
     clear();
-
-    console.log(productList);
   }
 }
+
 
 //------------ validation ----------//
 
@@ -382,63 +389,6 @@ productImage.addEventListener("change", function() {
 });
 
 
-async function addProduct() {
-  let user_id = JSON.parse(localStorage.getItem("lastId")) + 1;
-  if (validation()) {
-    let file = productImage.files[0];
-    let base64Image = await convertToBase64(file);
-    
-    var product = {
-      id: user_id.toString(),
-      name: productName.value,
-      price: productPrice.value,
-      category: selectedCategory.innerText,
-      description: productDesc.value,
-      stock_Quantity: stockQuantity.value,
-      image: base64Image // Save the image as a Base64 string
-    };
-    localStorage.setItem("lastId", product.id);
-    let data = await fetch("http://localhost:3000/products", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(product)
-    });
-    getProducts();
-    clear();
-  }
-}
-
-async function update() {
-  if (validation()) {
-    updateBtn.classList.add("d-none");
-    addBtn.classList.remove("d-none");
-
-    let file = productImage.files[0];
-    let base64Image = file ? await convertToBase64(file) : updatedProd.image;
-
-    var product = {
-      id: updatedProd.id,
-      name: productName.value,
-      price: productPrice.value,
-      category: selectedCategory.innerText,
-      description: productDesc.value,
-      stock_Quantity: stockQuantity.value,
-      image: base64Image,
-      rating: updatedProd.rating
-    };
-    let data = await fetch(`http://localhost:3000/products/${product.id}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(product)
-    });
-    getProducts();
-    clear();
-  }
-}
 
 function convertToBase64(file) {
   if(file){
@@ -454,21 +404,4 @@ function convertToBase64(file) {
     });
   }
 
-}
-function displayProducts(list) {
-  let productRows = ``;
-  for (let i = 0; i < list.length; i++) {
-    productRows += `<tr>
-        <td>${list[i].id}</td>
-        <td>${list[i].newName ? list[i].newName : list[i].name}</td>
-        <td>${list[i].price}</td>
-        <td>${list[i].category}</td>
-        <td>${list[i].description?.split(" ").slice(0, 15).join(" ")}</td>
-        <td>${list[i].stock_Quantity}</td>
-        <td><img src="${list[i].image}" alt="Product Image" class="prodImage"/></td>
-        <td><button onclick="getUpdatedProduct(${list[i].id})" class="btn btn-warning btn-sm">Update</button></td>
-        <td><button onclick="deleteProduct(${list[i].id})" class="btn btn-danger btn-sm">Delete</button></td>
-      </tr>`;
-  }
-  demo.innerHTML = productRows;
 }
